@@ -9,7 +9,7 @@
     <title>Player</title>
 </head>
 
-<body>
+<body onload='pauseMusic()'>
     <audio ontimeupdate='changeSlider()'>
         <source src="music/aakash-2.mp3" type="audio/mpeg">
     </audio>
@@ -17,7 +17,7 @@
         <section class="player">
             <div class="container">
                 <div class="top-icons">
-                    <a href="#"><i class="far fa-heart"></i></a>
+                    <a href="#"><i class="fa fa-heart"></i></a>
                 </div>
                 <div class="img">
                     <img src="img/aakash.JPG" alt="">
@@ -35,11 +35,11 @@
                 <input type="range" style='width:100%' id='timeInstance' min="0" max="100" value="0">
 
                 <div class="btns">
-                    <a href="#"><i class="fa fa-retweet"></i></a>
+                    <a href="#"><i id = 'retweet' class="fa fa-retweet"></i></a>
                     <a href="#"><i class="fa fa-backward" id="prev" title="Previous"></i></a>
                     <a href="#"><i class="fa fa-play" id="play" title="play"></i></a>
                     <a href="#"><i class="fa fa-forward" id="next" title="Next"></i></a>
-                    <a href="#"><i class="fa fa-random"></i></a>
+                    <a href="#"><i id = 'random' class="fa fa-random"></i></a>
                 </div>
             </div>
         </section>
@@ -52,35 +52,75 @@
         const title = document.getElementById("title");
         const prev = document.getElementById("prev");
         const next = document.getElementById("next");
+        const retweet = document.getElementById('retweet')
+        const random = document.getElementById('random')
         const timeInstance = document.getElementById('timeInstance')
         const time = document.querySelector('.time')
         var index = 0;
+        var retw = false;
         const songs = [{
             name: "aakash-1",
             title: "Love song",
             artist: "Aakash",
             src: 'music/aakash-2.mp3'
-        }, ];
+        }, {
+            name: "aakash-1",
+            title: "Love song1",
+            artist: "Aakash1",
+            src: 'music/aakash-1.mp3'
+        }];
+        var playSongs = songs;
+        retweet.addEventListener('click', () => {
+            retw = !retw
+
+            playSongs = retw ? [songs[index]] : songs
+            console.log(playSongs)
+        })
+
+        function shuffle(array) {
+            var currentIndex = array.length,
+                temporaryValue, randomIndex;
+
+            // While there remain elements to shuffle...
+            while (0 !== currentIndex) {
+
+                // Pick a remaining element...
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex -= 1;
+
+                // And swap it with the current element.
+                temporaryValue = array[currentIndex];
+                array[currentIndex] = array[randomIndex];
+                array[randomIndex] = temporaryValue;
+            }
+
+            return array;
+        }
+        random.addEventListener('click', () => {
+            playSongs = shuffle(songs)
+            console.log(playSongs)
+        })
+
 
         function playSong() {
-            music.src = songs[index].src
-            title.textContent = songs[index].title
-            artist.textContent = songs[index].artist
+            music.src = playSongs[index].src
+            title.textContent = playSongs[index].title
+            artist.textContent = playSongs[index].artist
             playMusic();
         }
         let isPlaying = false;
         next.addEventListener('click', () => {
-            index = index + 1 > songs.length - 1 ? 0 : index + 1
+            index = index + 1 > playSongs.length - 1 ? 0 : index + 1
             playSong();
-        })
+        });
         prev.addEventListener('click', () => {
-            index = index - 1 < 0 ? songs.length - 1 : index - 1
+            index = index - 1 < 0 ? playSongs.length - 1 : index - 1
             playSong();
-        })
+        });
         next.addEventListener('click', () => {
             index += 1;
             playSong();
-        })
+        });
         timeInstance.setAttribute('min', 0)
 
 
@@ -110,7 +150,15 @@
             time.children[1].textContent = formatTime(music.duration)
             timeInstance.setAttribute('max', music.duration)
         }
+        var heart = document.querySelector('.fa-heart');
+        heart.onclick = () => {
+            if (!heart.style.color || heart.style.color === 'black') {
+                heart.style.color = 'red'
 
+            } else {
+                heart.style.color = 'black'
+            }
+        }
 
         play.addEventListener('click', () => {
             if (isPlaying) {
@@ -127,8 +175,11 @@
         }
 
         timeInstance.addEventListener('change', () => {
+            if (music.currentTime === timeInstance.value) {
+                pauseMusic()
+            }
             music.currentTime = timeInstance.value
-        })
+        });
         playSong();
     </script>
 
