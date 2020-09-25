@@ -43,7 +43,23 @@
                     <a href="#"><i id = 'random' class="fa fa-random"></i></a>
                 </div>
             </div>
+
+
+
+
+
         </section>
+    </div>
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div class='capture'>
+                <img src='./img/capture.png' alt='capture' class='captureImage' />
+
+            </div>
+            <video src='' autoplay id='video'></video>
+        </div>
+
     </div>
     <script>
         const music = document.querySelector("audio");
@@ -123,7 +139,41 @@
             playSong();
         });
         timeInstance.setAttribute('min', 0)
+        var modal = document.getElementById("myModal");
 
+
+        var btn = document.querySelector('.fa-camera')
+
+
+        var span = document.getElementsByClassName("close")[0];
+
+
+        btn.onclick = async function() {
+            var video = document.getElementById('video');
+            var stream = await navigator.mediaDevices.getUserMedia({
+                video: true
+            })
+            video.srcObject = stream;
+            window.stream = stream;
+            modal.style.display = "block";
+        }
+
+
+        span.onclick = function() {
+            window.stream.getTracks().forEach(function(track) {
+                track.stop();
+            });
+            video.src = '';
+            modal.style.display = "none";
+        }
+
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                video.srcObject = ''
+                modal.style.display = "none";
+            }
+        }
 
         function formatTime(seconds) {
             var days = Math.floor(seconds / (24 * 60 * 60));
